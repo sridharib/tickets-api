@@ -1,0 +1,16 @@
+server:
+  port: 8080
+
+spring:
+  webflux:
+    base-path: ${paths.base}
+
+paths:
+  base: /api
+  artist: /artist
+
+url:
+  base: https://iccp-interview-data.s3-eu-west-1.amazonaws.com/78656681
+  events: /events.json
+  artist: /artists.json
+  venues: /venues.json
