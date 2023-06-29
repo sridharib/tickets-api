@@ -26,9 +26,8 @@ public class ArtistService {
 
     private String eventsURI;
 
-    public ArtistService(WebClient.Builder webClientBuilder, @Value("${url.base}") String baseURL, @Value("${url.artist}") String artistURI,
-                         @Value("${url.events}") String eventsURI) {
-        this.webClient = webClientBuilder.baseUrl(baseURL).build();
+    public ArtistService(@Value("${url.base}") String baseURL, @Value("${url.artist}") String artistURI, @Value("${url.events}") String eventsURI) {
+        this.webClient = WebClient.builder().baseUrl(baseURL).build();
         this.artistURI = artistURI;
         this.eventsURI = eventsURI;
     }

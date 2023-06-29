@@ -32,7 +32,7 @@ class ArtistServiceTest {
         mockWebServer = new MockWebServer();
         HttpUrl url = mockWebServer.url("/api");
         mockWebServer.start();
-        artistService = new ArtistService(WebClient.builder(), url.url().toString(), "/artist.json", "/events.json");
+        artistService = new ArtistService(url.url().toString(), "/artist.json", "/events.json");
     }
 
     @AfterEach
