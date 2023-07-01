@@ -1,7 +1,9 @@
 package com.tickets.api.artist;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import com.tickets.api.artist.dto.Artist;
+import com.tickets.api.artist.dto.Events;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,9 +14,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.time.LocalDateTime;
+
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static java.util.Arrays.asList;
 
 @ExtendWith(SpringExtension.class)
 @WebFluxTest(controllers = ArtistController.class)
@@ -30,6 +35,7 @@ public class ArtistIntegrationTest {
     void setUp() {
         wireMockServer = new WireMockServer(8085);
         wireMockServer.start();
+        WireMock.configureFor("localhost", 8085);
 
         stubFor(get("/artist.json")
                 .willReturn(aResponse()
@@ -38,7 +44,7 @@ public class ArtistIntegrationTest {
                         .withBody(buildArtist())
                 ));
 
-        stubFor(get("https://iccp-interview-data.s3-eu-west-1.amazonaws.com/78656681/events.json")
+        stubFor(get("/events.json")
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
@@ -46,6 +52,7 @@ public class ArtistIntegrationTest {
                 ));
     }
 
+    @Test
     public void testArtistById() {
         Artist artist = new Artist();
         artist.setId(21L);
@@ -53,6 +60,33 @@ public class ArtistIntegrationTest {
         artist.setRank(1);
         artist.setUrl("/hrh-prog-tickets/artist/21");
         artist.setImgSrc("//some-base-url/hrh-prog.jpg");
+
+        Events events1 = new Events();
+        events1.setId(1L);
+        events1.setTitle("Fusion Prog");
+        events1.setDateStatus("singleDate");
+        events1.setTimeZone("Europe/London");
+        events1.setStartDate(LocalDateTime.of(2020, 10, 17, 00, 00));
+        events1.setHiddenFromSearch(false);
+
+        Events events2 = new Events();
+        events2.setId(7L);
+        events2.setTitle("A festival Live");
+        events2.setDateStatus("singleDate");
+        events2.setTimeZone(null);
+        events2.setStartDate(null);
+        events2.setHiddenFromSearch(false);
+
+        Events events3 = new Events();
+        events3.setId(13L);
+        events3.setTitle("Huge Live");
+        events3.setDateStatus("multiDate");
+        events3.setTimeZone(null);
+        events3.setStartDate(null);
+        events3.setHiddenFromSearch(false);
+
+        artist.setEvents(asList(events1, events2, events3));
+
         this.webClient.get()
                 .uri("/artist/21").accept(MediaType.APPLICATION_JSON)
                 .exchange()
